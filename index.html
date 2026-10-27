@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تصنيف التفاعلات الكيميائية | كيمياء ١</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F8FB; --gridline:#E4E9F1; --ink:#172033; --muted:#5A6477; --card:#FFFFFF; --line:#D6DDE8;
+  --syn:#0E8F80; --com:#CF2F57; --dec:#A86F00; --sin:#7448CC; --dbl:#2360C4;
+  --ok:#0E8F80; --bad:#CF2F57; --soft:#EEF2F8;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#0F141D; --gridline:#19212E; --ink:#E7ECF4; --muted:#98A3B6; --card:#161D29; --line:#283244;
+    --syn:#2DC0AE; --com:#F2628A; --dec:#E6AE33; --sin:#A988F2; --dbl:#5E95F2;
+    --ok:#2DC0AE; --bad:#F2628A; --soft:#1C2534;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;color:var(--ink);background:var(--paper);
+  background-image:linear-gradient(var(--gridline) 1px,transparent 1px),linear-gradient(90deg,var(--gridline) 1px,transparent 1px);
+  background-size:32px 32px;font-size:18px;line-height:1.75;overflow:hidden;
+}
+h1,h2,h3{font-family:"IBM Plex Sans Arabic",sans-serif;line-height:1.3;margin:0}
+h2{font-size:clamp(28px,3.4vw,44px);font-weight:700}
+h3{font-size:22px;font-weight:600;margin-bottom:8px}
+p{margin:0 0 12px;max-width:68ch}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--dbl);outline-offset:2px}
+
+.t-syn{--c:var(--syn)} .t-com{--c:var(--com)} .t-dec{--c:var(--dec)} .t-sin{--c:var(--sin)} .t-dbl{--c:var(--dbl)}
+
+/* slides */
+main{position:fixed;inset:0 0 68px 0}
+.slide{position:absolute;inset:0;padding:clamp(20px,4vw,56px) clamp(18px,5vw,72px);overflow-y:auto;display:none}
+.slide.active{display:block;animation:enter .35s ease-out}
+@keyframes enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.inner{max-width:1180px;margin:0 auto}
+.slide-head{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+.back-types{margin-right:auto;border:1px solid var(--c);background:var(--card);color:var(--c);border-radius:10px;padding:8px 16px;font-weight:500;white-space:nowrap}
+.back-types:hover{background:var(--c);color:#fff}
+.swatch{width:14px;height:44px;border-radius:7px;background:var(--c,var(--ink))}
+.sub{color:var(--muted);margin-top:4px}
+
+/* bottom bar */
+.bar{position:fixed;inset:auto 0 0 0;height:68px;display:flex;align-items:center;gap:10px;padding:0 16px;background:var(--card);border-top:1px solid var(--line);z-index:5}
+.bar button{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 14px}
+.bar .primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.progress{flex:1;height:6px;background:var(--soft);border-radius:3px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--ink);transition:width .3s}
+.count{min-width:64px;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.menu{position:fixed;inset:0 0 68px 0;background:color-mix(in srgb,var(--paper) 94%,transparent);backdrop-filter:blur(6px);z-index:6;display:none;overflow:auto;padding:40px 20px}
+.menu.open{display:block}
+.menu ol{max-width:640px;margin:0 auto;padding:0;list-style:none;counter-reset:s}
+.menu li button{width:100%;text-align:right;border:0;border-bottom:1px solid var(--line);background:none;padding:12px 6px;display:flex;gap:14px}
+.menu li button::before{counter-increment:s;content:counter(s);color:var(--muted);min-width:28px;font-variant-numeric:tabular-nums}
+.menu li button:hover{background:var(--soft)}
+
+/* equations */
+.eq{direction:ltr;unicode-bidi:isolate;display:inline-block;font-weight:500;font-size:1.12em;letter-spacing:.2px;white-space:nowrap}
+.eq sub{font-size:.68em}
+.f{direction:ltr;unicode-bidi:isolate;display:inline-block}
+
+/* title */
+.hero{min-height:calc(100vh - 160px);display:flex;flex-direction:column;justify-content:center}
+.hero h1{font-size:clamp(46px,8vw,104px);font-weight:700;letter-spacing:-1px;margin:10px 0 18px}
+.hero .meta{color:var(--muted);font-size:20px;margin:0}
+.reaction{display:flex;align-items:center;gap:12px;direction:ltr;margin:28px 0 8px;flex-wrap:wrap}
+.atom{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:24px;font-family:"IBM Plex Sans Arabic"}
+.atom.a{background:var(--sin)} .atom.b{background:var(--dec)} .atom.c{background:var(--dbl)}
+.pair{display:flex}.pair .atom+.atom{margin-left:-10px}
+.op{font-size:30px;color:var(--muted)}
+.after{opacity:0;animation:appear .6s ease-out 1.1s forwards}
+.arrow{opacity:0;animation:appear .4s ease-out .7s forwards}
+@keyframes appear{to{opacity:1}}
+.five{display:flex;gap:6px;margin-top:26px;max-width:520px}
+.five span{flex:1;height:8px;border-radius:4px}
+
+/* generic blocks */
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:28px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.lead{font-size:21px}
+.goals{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.goals li{background:var(--card);border:1px solid var(--line);border-right:6px solid var(--c);border-radius:10px;padding:14px 18px}
+
+.pattern{direction:ltr;display:flex;align-items:center;gap:10px;margin:6px 0 20px;flex-wrap:wrap}
+.blk{min-width:56px;height:56px;padding:0 12px;border-radius:10px;display:grid;place-items:center;font-family:"IBM Plex Sans Arabic";font-size:24px;font-weight:700;background:var(--c);color:#fff}
+.blk.o{background:transparent;color:var(--c);border:2px dashed var(--c)}
+.pattern i{font-style:normal;font-size:26px;color:var(--muted)}
+.eqs{list-style:none;padding:0;margin:0 0 10px}
+.eqs li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;padding:12px 0;border-bottom:1px solid var(--line)}
+.eqs small{color:var(--muted);font-size:15px}
+.homeland{border:1px solid var(--line);border-radius:14px;padding:18px 20px;background:var(--card);margin-bottom:16px;position:relative;overflow:hidden}
+.homeland::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:#1B7A43}
+.homeland h3{color:#1B7A43}
+@media (prefers-color-scheme: dark){.homeland h3{color:#4CC685}.homeland::before{background:#4CC685}}
+.check{border:2px dashed var(--c);border-radius:14px;padding:16px 20px}
+.btn{border:1px solid var(--c,var(--ink));background:transparent;color:var(--c,var(--ink));border-radius:10px;padding:8px 16px;font-weight:500}
+.btn.fill{background:var(--c,var(--ink));color:#fff}
+.ans{margin-top:10px;font-weight:500}
+.note{color:var(--muted);font-size:16px}
+
+/* warmup */
+.scenes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:12px 0 22px}
+@media (max-width:800px){.scenes{grid-template-columns:1fr}}
+.scene{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.scene .emoji{font-size:40px;line-height:1}
+.evidence{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.evidence span{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 16px}
+
+/* map of types */
+.types{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+@media (max-width:1000px){.types{grid-template-columns:repeat(2,1fr)}}
+.type-card{text-align:right;background:var(--card);border:1px solid var(--line);border-top:8px solid var(--c);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.type-card:hover{border-color:var(--c)}
+.type-card b{font-family:"IBM Plex Sans Arabic";font-size:22px;color:var(--c)}
+
+/* activity series */
+.series{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.series span{direction:ltr;min-width:44px;text-align:center;padding:6px 8px;border-radius:8px;background:var(--soft);font-weight:500}
+.series span.h{background:transparent;border:1px dashed var(--muted)}
+.series-ends{display:flex;justify-content:space-between;color:var(--muted);font-size:15px}
+
+/* predictor */
+.pred{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+@media (max-width:700px){.pred{grid-template-columns:1fr}}
+.pred label{display:block;font-weight:500;margin-bottom:6px}
+select,input[type=text],input[type=number],textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 12px}
+.result{min-height:150px;border-radius:14px;padding:22px;background:var(--card);border:2px solid var(--line)}
+.result.yes{border-color:var(--ok)} .result.no{border-color:var(--bad)}
+.result .big{font-family:"IBM Plex Sans Arabic";font-size:26px;margin-bottom:8px}
+.result .eq{font-size:1.5em;margin:6px 0 10px}
+
+/* videos */
+.videos{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+@media (max-width:800px){.videos{grid-template-columns:1fr}}
+.vid{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.vid .frame{aspect-ratio:16/9;background:var(--soft);display:grid;place-items:center;text-align:center;padding:16px}
+.vid iframe{width:100%;height:100%;border:0}
+.vid .body{padding:14px 18px}
+.vid .row{display:flex;gap:8px;margin-top:8px}
+.vid .row input{flex:1}
+.vid a.btn{text-decoration:none;display:inline-block}
+
+/* game */
+.game{max-width:820px;margin:0 auto;text-align:center}
+.hud{display:flex;justify-content:center;gap:28px;font-size:20px;margin-bottom:16px;font-variant-numeric:tabular-nums}
+.hud b{font-family:"IBM Plex Sans Arabic";font-size:30px;display:block}
+.game-eq{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:34px 16px;margin-bottom:18px;transition:border-color .2s}
+.game-eq .eq{font-size:clamp(24px,3.6vw,40px);white-space:normal}
+.game-eq.right{border-color:var(--ok)} .game-eq.wrong{border-color:var(--bad)}
+.choices{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+@media (max-width:760px){.choices{grid-template-columns:repeat(2,1fr)}}
+.choices button{border:0;border-radius:12px;padding:16px 8px;background:var(--c);color:#fff;font-weight:700;font-size:18px}
+.choices button:disabled{opacity:.45}
+.feedback{min-height:32px;margin-top:12px;font-weight:500}
+
+/* homeland map */
+.places{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.place{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;border-right:6px solid var(--c)}
+.place .where{color:var(--muted);font-size:15px}
+.place b{display:block;font-family:"IBM Plex Sans Arabic";font-size:21px;margin:2px 0 6px}
+.chip{display:inline-block;font-size:14px;padding:2px 12px;border-radius:999px;background:var(--c);color:#fff;margin-bottom:8px}
+
+/* subjects */
+.subj{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.subj .icon{font-size:30px}
+.verse{font-family:"IBM Plex Sans Arabic";font-size:21px;line-height:1.9}
+
+/* worksheets */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tabs button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 16px}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ws{display:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.ws.show{display:block}
+.ws-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px}
+.ws-fields{display:flex;gap:10px;flex-wrap:wrap}
+.ws-fields input{width:180px}
+.stem{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width:800px){.stem{grid-template-columns:1fr}}
+.stem section{border:1px solid var(--line);border-radius:12px;padding:16px}
+.stem .letter{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.stem .letter span{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:700;font-family:"IBM Plex Sans Arabic";font-size:20px}
+.stem .S span{background:var(--syn)} .stem .T span{background:var(--dbl)} .stem .E span{background:var(--sin)} .stem .M span{background:var(--com)}
+.stem .letter b{font-family:"IBM Plex Sans Arabic";font-size:19px}
+.stem textarea{min-height:84px;resize:vertical;margin-top:6px}
+.mrow{display:flex;gap:8px;align-items:center;margin-top:8px}
+.mrow input{width:120px}
+.mres{font-weight:500}
+
+/* team quiz */
+.quiz{max-width:900px;margin:0 auto}
+.teams-setup{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.teams-setup input{width:180px}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
+.team{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:12px 14px}
+.team.turn{border-color:var(--ink)}
+.team b{font-family:"IBM Plex Sans Arabic";font-size:28px;display:block;font-variant-numeric:tabular-nums}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+.qtop{display:flex;justify-content:space-between;color:var(--muted);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.qtext{font-size:24px;font-weight:500;margin-bottom:18px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.opts{grid-template-columns:1fr}}
+.opts button{text-align:right;border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:14px 16px;font-size:19px}
+.opts button.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--card))}
+.opts button.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--card))}
+.timer{height:6px;background:var(--soft);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.timer span{display:block;height:100%;background:var(--ink);transition:width 1s linear}
+.winner{text-align:center;padding:30px}
+.winner h3{font-size:40px}
+
+/* summary */
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden}
+th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;vertical-align:top}
+th{background:var(--soft);font-family:"IBM Plex Sans Arabic";font-weight:600}
+td:first-child{font-weight:700;color:var(--c)}
+.exit-item{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.exit-item select{width:200px}
+.mark{font-weight:700}
+
+#printArea{display:none}
+@media print{
+  body{overflow:visible;background:#fff;color:#000}
+  body>*:not(#printArea){display:none!important}
+  #printArea{display:block}
+  #printArea .ws{display:block;border:0;padding:0}
+  #printArea button{display:none}
+  #printArea .stem section{break-inside:avoid}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+  .after,.arrow{opacity:1}
+}
+</style>
+</head>
+<body>
+
+<main id="deck">
+
+<!-- 1 العنوان -->
+<section class="slide" data-title="العنوان">
+  <div class="inner hero">
+    <p class="meta">كيمياء ١ | الصف الأول الثانوي</p>
+    <h1>تصنيف التفاعلات الكيميائية</h1>
+    <p class="lead">الذرات لا تفنى ولا تُخلق في التفاعل، بل يُعاد ترتيبها. وطريقة الترتيب هي التي تحدد نوع التفاعل.</p>
+    <div class="reaction" aria-label="مثال: عنصر يحل محل عنصر آخر في مركب">
+      <div class="atom a">A</div><span class="op">+</span>
+      <div class="pair"><div class="atom b">B</div><div class="atom c">C</div></div>
+      <span class="op arrow">→</span>
+      <div class="pair after"><div class="atom a">A</div><div class="atom c">C</div></div>
+      <span class="op after">+</span>
+      <div class="atom b after">B</div>
+    </div>
+    <div class="five" aria-hidden="true">
+      <span style="background:var(--syn)"></span><span style="background:var(--com)"></span><span style="background:var(--dec)"></span><span style="background:var(--sin)"></span><span style="background:var(--dbl)"></span>
+    </div>
+  </div>
+</section>
+
+<!-- 2 الأهداف -->
+<section class="slide" data-title="نواتج التعلم">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>في نهاية الدرس ستكونين قادرة على</h2></div>
+    <ul class="goals">
+      <li class="t-syn">تصنيف التفاعلات إلى خمسة أنواع: التكوين، الاحتراق، التفكك، الإحلال البسيط، الإحلال المزدوج.</li>
+      <li class="t-com">التنبؤ بنواتج التفاعل من خلال شكل المتفاعلات.</li>
+      <li class="t-sin">استخدام سلسلة النشاط لتوقّع حدوث تفاعل الإحلال البسيط أو عدم حدوثه.</li>
+      <li class="t-dbl">تحديد نواتج الإحلال المزدوج: راسب أو ماء أو غاز.</li>
+      <li class="t-dec">ربط كل نوع بتطبيق صناعي في المملكة العربية السعودية.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 3 التهيئة -->
+<section class="slide" data-title="تهيئة: ثلاثة مشاهد">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>ثلاثة مشاهد من يومك</h2></div>
+    <div class="scenes">
+      <div class="scene"><div class="emoji">🔥</div><h3>موقد الغاز في المطبخ</h3><p>شعلة زرقاء وحرارة عالية.</p></div>
+      <div class="scene"><div class="emoji">🚗</div><h3>الوسادة الهوائية</h3><p>تنتفخ خلال جزء من الثانية عند الاصطدام.</p></div>
+      <div class="scene"><div class="emoji">🚰</div><h3>غلاية الماء</h3><p>طبقة بيضاء قاسية تتراكم في قاعها.</p></div>
+    </div>
+    <div class="panel">
+      <h3>ما الذي يجمع هذه المشاهد؟</h3>
+      <button class="btn fill reveal" style="--c:var(--ink)">أظهري الإجابة</button>
+      <div class="ans" hidden>
+        <p>في كل مشهد تتكون مواد جديدة بخواص مختلفة، أي أن تفاعلًا كيميائيًا حدث. لكن كل تفاعل منها من نوع مختلف، وسنكتشف أنواعها اليوم.</p>
+        <p>كيف نعرف أن تفاعلًا حدث؟ من أدلته:</p>
+        <div class="evidence"><span>تغيّر اللون</span><span>تصاعد غاز</span><span>تكوّن راسب</span><span>انطلاق طاقة أو امتصاصها</span><span>تغيّر الرائحة</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 خريطة الأنواع -->
+<section class="slide" data-title="الأنواع الخمسة" id="types">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><div><h2>خمسة أنواع رئيسة</h2><p class="sub">اختاري نوعًا للانتقال إلى شرحه</p></div></div>
+    <div class="types">
+      <button class="type-card t-syn" data-goto="syn"><b>التكوين</b><span class="eq">A + B → AB</span><span class="note">مواد تتحد في مركب واحد</span></button>
+      <button class="type-card t-com" data-goto="com"><b>الاحتراق</b><span class="eq">X + O2 → أكاسيد</span><span class="note">تفاعل سريع مع الأكسجين</span></button>
+      <button class="type-card t-dec" data-goto="dec"><b>التفكك</b><span class="eq">AB → A + B</span><span class="note">مركب واحد يتجزأ</span></button>
+      <button class="type-card t-sin" data-goto="sin"><b>الإحلال البسيط</b><span class="eq">A + BC → AC + B</span><span class="note">عنصر يحل محل عنصر</span></button>
+      <button class="type-card t-dbl" data-goto="dbl"><b>الإحلال المزدوج</b><span class="eq">AB + CD → AD + CB</span><span class="note">تبادل الأيونات الموجبة</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- 5 التكوين -->
+<section class="slide t-syn" data-title="تفاعل التكوين" id="syn">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>تفاعل التكوين</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="pattern"><span class="blk">A</span><i>+</i><span class="blk">B</span><i>→</i><span class="blk">AB</span></div>
+        <p class="lead">تتحد مادتان أو أكثر لتكوين مادة واحدة. علامته: ناتج واحد فقط.</p>
+        <ul class="eqs">
+          <li><span class="eq">2Na + Cl2 → 2NaCl</span><small>عنصر + عنصر</small></li>
+          <li><span class="eq">CaO + H2O → Ca(OH)2</span><small>مركب + مركب</small></li>
+          <li><span class="eq">2SO2 + O2 → 2SO3</span><small>مركب + عنصر</small></li>
+        </ul>
+      </div>
+      <div>
+        <div class="homeland"><h3>من وطني</h3><p>في مصانع الأسمدة بمدينة الجبيل الصناعية يتحد النيتروجين مع الهيدروجين لإنتاج الأمونيا، وهي أساس الأسمدة التي تدعم الزراعة والأمن الغذائي.</p><span class="eq">N2 + 3H2 → 2NH3</span></div>
+        <div class="check"><p>تحقّقي: هل احتراق المغنيسيوم <span class="eq">2Mg + O2 → 2MgO</span> تفاعل تكوين؟</p><button class="btn reveal">أظهري الإجابة</button><p class="ans" hidden>نعم، ناتج واحد من عنصرين، وهو أيضًا تفاعل احتراق لأن الأكسجين متفاعل وتنطلق طاقة. التفاعل الواحد قد ينتمي إلى أكثر من نوع.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 الاحتراق -->
+<section class="slide t-com" data-title="تفاعل الاحتراق" id="com">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>تفاعل الاحتراق</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="pattern"><span class="blk o">مادة</span><i>+</i><span class="blk">O<sub>2</sub></span><i>→</i><span class="blk o">أكاسيد</span><i>+</i><span class="blk">طاقة</span></div>
+        <p class="lead">تتحد مادة مع الأكسجين بسرعة وتنطلق طاقة على شكل حرارة وضوء. احتراق المركبات الهيدروكربونية احتراقًا تامًا ينتج ثاني أكسيد الكربون والماء.</p>
+        <ul class="eqs">
+          <li><span class="eq">CH4 + 2O2 → CO2 + 2H2O</span><small>احتراق الميثان</small></li>
+          <li><span class="eq">C3H8 + 5O2 → 3CO2 + 4H2O</span><small>غاز الطبخ (البروبان)</small></li>
+          <li><span class="eq">2H2 + O2 → 2H2O</span><small>وقود الصواريخ</small></li>
+        </ul>
+      </div>
+      <div>
+        <div class="homeland"><h3>من وطني</h3><p>تنتج أرامكو السعودية الغاز الطبيعي، ومكوّنه الرئيس الميثان، ويحترق في محطات توليد الكهرباء لتصل الطاقة إلى بيوتنا ومدارسنا.</p></div>
+        <div class="check"><p>تحقّقي: ما الذي يميّز الاحتراق عن غيره من الأنواع؟</p><button class="btn reveal">أظهري الإجابة</button><p class="ans" hidden>وجود الأكسجين متفاعلًا دائمًا، وانطلاق كمية كبيرة من الطاقة.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 التفكك -->
+<section class="slide t-dec" data-title="تفاعل التفكك" id="dec">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>تفاعل التفكك</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="pattern"><span class="blk">AB</span><i>→</i><span class="blk">A</span><i>+</i><span class="blk">B</span></div>
+        <p class="lead">مركب واحد يتجزأ إلى عنصرين أو أكثر أو مركبات أبسط. عكس التكوين، وغالبًا يحتاج إلى طاقة: حرارة أو كهرباء أو ضوء.</p>
+        <ul class="eqs">
+          <li><span class="eq">2NaN3 → 2Na + 3N2</span><small>الوسادة الهوائية</small></li>
+          <li><span class="eq">2H2O → 2H2 + O2</span><small>التحليل الكهربائي للماء</small></li>
+          <li><span class="eq">CaCO3 → CaO + CO2</span><small>تسخين الحجر الجيري</small></li>
+        </ul>
+      </div>
+      <div>
+        <div class="homeland"><h3>من وطني</h3><p>في نيوم يُبنى مشروع لإنتاج الهيدروجين الأخضر بتحليل الماء كهربائيًا بطاقة الشمس والرياح، وقودٌ نظيف ضمن مستهدفات رؤية ٢٠٣٠. ومصانع الإسمنت في المملكة تفكك الحجر الجيري بالحرارة لإنتاج الجير.</p></div>
+        <div class="check"><p>تحقّقي: لماذا يُعد التفكك عكس التكوين؟</p><button class="btn reveal">أظهري الإجابة</button><p class="ans" hidden>التكوين يبدأ بعدة مواد وينتهي بمادة واحدة، والتفكك يبدأ بمادة واحدة وينتهي بعدة مواد.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 الإحلال البسيط -->
+<section class="slide t-sin" data-title="الإحلال البسيط" id="sin">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>تفاعل الإحلال البسيط</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="pattern"><span class="blk">A</span><i>+</i><span class="blk o">BC</span><i>→</i><span class="blk o">AC</span><i>+</i><span class="blk">B</span></div>
+        <p class="lead">عنصر يحل محل عنصر آخر في مركب، بشرط أن يكون أكثر نشاطًا منه. الفلز يحل محل فلز أو هيدروجين، والهالوجين يحل محل هالوجين.</p>
+        <ul class="eqs">
+          <li><span class="eq">Zn + CuSO4 → ZnSO4 + Cu</span><small>فلز محل فلز</small></li>
+          <li><span class="eq">2Na + 2H2O → 2NaOH + H2</span><small>فلز محل هيدروجين</small></li>
+          <li><span class="eq">Cl2 + 2NaBr → 2NaCl + Br2</span><small>هالوجين محل هالوجين</small></li>
+        </ul>
+        <h3 style="margin-top:14px">سلسلة نشاط الفلزات</h3>
+        <div class="series" id="seriesBar"></div>
+        <div class="series-ends"><span>الأكثر نشاطًا</span><span>الأقل نشاطًا</span></div>
+        <p class="note">نشاط الهالوجينات: الفلور أنشطها ثم الكلور ثم البروم ثم اليود.</p>
+      </div>
+      <div>
+        <div class="homeland"><h3>من وطني</h3><p>تُلحم قضبان السكك الحديدية بطريقة الثرميت: الألومنيوم أنشط من الحديد فيحل محله، وتنطلق حرارة تصهر الحديد الناتج فيملأ الفراغ بين القضبان.</p><span class="eq">Fe2O3 + 2Al → Al2O3 + 2Fe</span></div>
+        <div class="check"><p>تحقّقي: هل يتفاعل النحاس مع محلول نترات الصوديوم؟</p><button class="btn reveal">أظهري الإجابة</button><p class="ans" hidden>لا، لأن النحاس أقل نشاطًا من الصوديوم في سلسلة النشاط.</p></div>
+        <button class="btn fill" style="margin-top:14px" data-goto="pred">جرّبي محاكي سلسلة النشاط</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 المحاكي -->
+<section class="slide t-sin" data-title="محاكي سلسلة النشاط" id="pred">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><div><h2>هل يحدث التفاعل؟</h2><p class="sub">توقّعي أولًا، ثم اختاري العنصر والمركب وتحقّقي</p></div></div>
+    <div class="pred">
+      <div><label for="pEl">العنصر الحر</label><select id="pEl"></select></div>
+      <div><label for="pCmp">المركب في المحلول</label><select id="pCmp"></select></div>
+    </div>
+    <div class="result" id="pRes" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- 10 الإحلال المزدوج -->
+<section class="slide t-dbl" data-title="الإحلال المزدوج" id="dbl">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>تفاعل الإحلال المزدوج</h2></div>
+    <div class="grid2">
+      <div>
+        <div class="pattern"><span class="blk o">AB</span><i>+</i><span class="blk o">CD</span><i>→</i><span class="blk o">AD</span><i>+</i><span class="blk o">CB</span></div>
+        <p class="lead">تتبادل الأيونات الموجبة في مركبين أماكنها، ويحدث عادة في المحاليل المائية. ويحدث التفاعل عندما يتكوّن أحد ثلاثة نواتج: راسب، أو ماء، أو غاز.</p>
+        <ul class="eqs">
+          <li><span class="eq">AgNO3 + NaCl → AgCl↓ + NaNO3</span><small>يتكوّن راسب</small></li>
+          <li><span class="eq">HCl + NaOH → NaCl + H2O</span><small>يتكوّن ماء</small></li>
+          <li><span class="eq">2HCl + Na2S → 2NaCl + H2S↑</span><small>يتكوّن غاز</small></li>
+        </ul>
+      </div>
+      <div>
+        <div class="homeland"><h3>من وطني</h3><p>المملكة من أكبر منتجي المياه المحلاة في العالم. تتكوّن في الأنابيب والأجهزة رواسب من كربونات الكالسيوم تُعرف بالقشور، ولمعالجتها يُستفاد من تفاعلات الترسيب لإزالة أيونات الكالسيوم قبل أن تترسب في الأنابيب.</p><span class="eq">CaCl2 + Na2CO3 → CaCO3↓ + 2NaCl</span></div>
+        <div class="check"><p>تحقّقي: ما الراسب في تفاعل <span class="eq">BaCl2 + Na2SO4</span>؟</p><button class="btn reveal">أظهري الإجابة</button><p class="ans" hidden>كبريتات الباريوم <span class="eq">BaSO4</span>، والناتج الآخر <span class="eq">2NaCl</span> يبقى ذائبًا.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 الفيديوهات -->
+<section class="slide" data-title="مقاطع الفيديو">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><div><h2>شاهدي وتعلّمي</h2><p class="sub">الصقي رابط أي مقطع من يوتيوب لعرضه هنا داخل العرض</p></div></div>
+    <div class="videos" id="videos"></div>
+  </div>
+</section>
+
+<!-- 12 لعبة التصنيف -->
+<section class="slide" data-title="مسابقة: صنّفي بسرعة">
+  <div class="inner game">
+    <div class="slide-head" style="justify-content:center"><h2>صنّفي بسرعة</h2></div>
+    <div class="hud"><div>الوقت<b id="gTime">60</b></div><div>النقاط<b id="gScore">0</b></div><div>سلسلة<b id="gStreak">0</b></div></div>
+    <div class="game-eq" id="gEq"><p class="lead" style="margin:0 auto">٦٠ ثانية لتصنيف أكبر عدد من المعادلات. كل إجابة صحيحة بعشر نقاط، وثلاث إجابات متتالية تمنحك خمس نقاط إضافية.</p></div>
+    <div class="choices" id="gChoices">
+      <button class="t-syn" data-t="syn" disabled>تكوين</button>
+      <button class="t-com" data-t="com" disabled>احتراق</button>
+      <button class="t-dec" data-t="dec" disabled>تفكك</button>
+      <button class="t-sin" data-t="sin" disabled>إحلال بسيط</button>
+      <button class="t-dbl" data-t="dbl" disabled>إحلال مزدوج</button>
+    </div>
+    <div class="feedback" id="gFb" aria-live="polite"></div>
+    <button class="btn fill" id="gStart" style="--c:var(--ink);margin-top:10px">ابدئي التحدي</button>
+  </div>
+</section>
+
+<!-- 13 الوطن -->
+<section class="slide" data-title="التفاعلات في وطني">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch" style="background:#1B7A43"></span><div><h2>التفاعلات في وطني</h2><p class="sub">كل نوع درسناه يعمل اليوم في مشروع سعودي</p></div></div>
+    <div class="places">
+      <div class="place t-syn"><span class="chip">تكوين</span><div class="where">الجبيل الصناعية</div><b>الأمونيا والأسمدة</b><p>اتحاد النيتروجين والهيدروجين لإنتاج الأمونيا التي تدخل في صناعة الأسمدة.</p></div>
+      <div class="place t-com"><span class="chip">احتراق</span><div class="where">محطات الكهرباء</div><b>الغاز الطبيعي</b><p>احتراق الميثان يولّد الحرارة التي تُدير التوربينات وتنتج الكهرباء.</p></div>
+      <div class="place t-dec"><span class="chip">تفكك</span><div class="where">نيوم</div><b>الهيدروجين الأخضر</b><p>تحليل الماء كهربائيًا بطاقة متجددة لإنتاج وقود لا ينبعث منه كربون.</p></div>
+      <div class="place t-sin"><span class="chip">إحلال بسيط</span><div class="where">شبكات القطارات</div><b>لحام القضبان بالثرميت</b><p>الألومنيوم يحل محل الحديد في أكسيده وتنطلق حرارة تكفي لصهر الحديد.</p></div>
+      <div class="place t-dbl"><span class="chip">إحلال مزدوج</span><div class="where">محطات التحلية</div><b>معالجة القشور</b><p>تفاعلات الترسيب تزيل أيونات الكالسيوم لحماية الأنابيب والأجهزة.</p></div>
+      <div class="place" style="--c:#1B7A43"><span class="chip">رؤية ٢٠٣٠</span><div class="where">سؤال للنقاش</div><b>أي تفاعل نحتاج أن نقلّل منه؟</b><p>الاحتراق يطلق ثاني أكسيد الكربون. كيف يساعد التحول إلى الهيدروجين والطاقة الشمسية على تحقيق الحياد الصفري؟</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 ربط المواد -->
+<section class="slide" data-title="الربط بالمواد الأخرى">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>التفاعلات في المواد الأخرى</h2></div>
+    <div class="grid3">
+      <div class="subj"><div class="icon">🧬</div><h3>الأحياء</h3><p>التنفس الخلوي يشبه الاحتراق: الجلوكوز يتفاعل مع الأكسجين وينتج ثاني أكسيد الكربون والماء وطاقة، لكن ببطء وعلى مراحل داخل الخلية.</p><span class="eq">C6H12O6 + 6O2 → 6CO2 + 6H2O</span></div>
+      <div class="subj"><div class="icon">⚡</div><h3>الفيزياء</h3><p>قانون حفظ الطاقة: تفاعلات طاردة تطلق الطاقة كالاحتراق، وتفاعلات ماصة تحتاجها كالتفكك. وفي الوسادة الهوائية يرتفع ضغط غاز النيتروجين فتنتفخ.</p></div>
+      <div class="subj"><div class="icon">➗</div><h3>الرياضيات</h3><p>وزن المعادلة تطبيق للنسب والتناسب: عدد الذرات في الطرفين متساوٍ دائمًا، تمامًا كطرفي المعادلة الرياضية.</p></div>
+      <div class="subj"><div class="icon">🪨</div><h3>علوم الأرض</h3><p>الصواعد والهوابط في الكهوف الجيرية تتكوّن عندما تترسب كربونات الكالسيوم من الماء قطرة بعد قطرة عبر آلاف السنين.</p></div>
+      <div class="subj"><div class="icon">✍️</div><h3>لغتي</h3><p>«الإحلال» مصدر الفعل أحلّ، أي وضع شيئًا مكان شيء. و«التفكك» على وزن التفعّل ويدل على التجزؤ. أسماء الأنواع تصف ما يحدث فعلًا للذرات.</p></div>
+      <div class="subj"><div class="icon">📖</div><h3>الدراسات الإسلامية</h3><p class="verse">﴿وَأَنزَلْنَا الْحَدِيدَ فِيهِ بَأْسٌ شَدِيدٌ وَمَنَافِعُ لِلنَّاسِ﴾</p><p class="note">سورة الحديد، الآية ٢٥. نستخلص الحديد من خاماته بتفاعلات الإحلال ونصنع منه ما ينفع الناس.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 أوراق العمل -->
+<section class="slide" data-title="أوراق عمل STEM">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><div><h2>أوراق عمل بمنهجية <span class="f">STEM</span></h2><p class="sub">علوم، تقنية، هندسة، رياضيات. اختاري ورقة، اكتبي إجاباتك، ثم اطبعيها</p></div></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-ws="ws1">وسادة أمان آمنة</button>
+      <button role="tab" aria-selected="false" data-ws="ws2">أنابيب بلا قشور</button>
+      <button role="tab" aria-selected="false" data-ws="ws3">حماية خزان الماء</button>
+    </div>
+
+    <div class="ws show" id="ws1">
+      <div class="ws-top"><div><h3>مهمة: صمّمي وسادة هوائية لسيارة سعودية الصنع</h3><p class="note">نوع التفاعل المستهدف: التفكك</p></div>
+        <div class="ws-fields"><input type="text" placeholder="الاسم"><input type="text" placeholder="الفصل"></div></div>
+      <p>شركة سيارات سعودية تطلب منك تصميم وسادة هوائية تنتفخ خلال أقل من عُشر ثانية. يعتمد التصميم على تفكك أزيد الصوديوم: <span class="eq">2NaN3 → 2Na + 3N2</span></p>
+      <div class="stem">
+        <section class="S"><div class="letter"><span>S</span><b>العلوم</b></div><p>صنّفي التفاعل وفسّري: لماذا يُعد غاز النيتروجين مناسبًا لملء الوسادة؟</p><textarea></textarea></section>
+        <section class="T"><div class="letter"><span>T</span><b>التقنية</b></div><p>ما دور حسّاس التصادم في السيارة؟ ارسمي مخططًا بسيطًا لتسلسل الأحداث من الاصطدام حتى الانتفاخ.</p><textarea></textarea></section>
+        <section class="E"><div class="letter"><span>E</span><b>الهندسة</b></div><p>الصوديوم الناتج مادة نشطة وخطرة. اقترحي فكرة هندسية للتعامل معه داخل الوسادة بأمان.</p><textarea></textarea></section>
+        <section class="M"><div class="letter"><span>M</span><b>الرياضيات</b></div><p>كل وحدتين من <span class="eq">NaN3</span> تعطيان ثلاث وحدات من <span class="eq">N2</span>. إذا احتاجت الوسادة إلى ٦٠ وحدة من النيتروجين، فكم وحدة من أزيد الصوديوم تلزم؟</p>
+          <div class="mrow"><input type="number" data-answer="40" aria-label="الإجابة"><button class="btn mcheck" style="--c:var(--com)">تحقّقي</button><span class="mres"></span></div></section>
+      </div>
+      <button class="btn fill print-ws" style="--c:var(--ink);margin-top:16px">اطبعي الورقة</button>
+    </div>
+
+    <div class="ws" id="ws2">
+      <div class="ws-top"><div><h3>مهمة: احمي أنابيب محطة التحلية من القشور</h3><p class="note">نوع التفاعل المستهدف: الإحلال المزدوج</p></div>
+        <div class="ws-fields"><input type="text" placeholder="الاسم"><input type="text" placeholder="الفصل"></div></div>
+      <p>مهندسو محطة تحلية لاحظوا ضعف تدفق الماء بسبب تراكم كربونات الكالسيوم داخل الأنابيب. تقترحين إضافة كربونات الصوديوم في خزان معالجة قبل دخول الماء للأنابيب: <span class="eq">CaCl2 + Na2CO3 → CaCO3↓ + 2NaCl</span></p>
+      <div class="stem">
+        <section class="S"><div class="letter"><span>S</span><b>العلوم</b></div><p>ما نوع التفاعل؟ وما الراسب؟ ولماذا يحدث التفاعل أصلًا؟</p><textarea></textarea></section>
+        <section class="T"><div class="letter"><span>T</span><b>التقنية</b></div><p>اقترحي أداة أو حسّاسًا يقيس عسر الماء لتعرف المحطة متى تضيف المادة المعالِجة.</p><textarea></textarea></section>
+        <section class="E"><div class="letter"><span>E</span><b>الهندسة</b></div><p>صمّمي خزان المعالجة: أين يتجمع الراسب؟ وكيف يُفصل عن الماء قبل خروجه؟ صفي تصميمك أو ارسميه.</p><textarea></textarea></section>
+        <section class="M"><div class="letter"><span>M</span><b>الرياضيات</b></div><p>كل وحدة من <span class="eq">CaCl2</span> تنتج وحدتين من <span class="eq">NaCl</span>. إذا تفاعلت ٥٠٠ وحدة من كلوريد الكالسيوم، فكم وحدة من كلوريد الصوديوم تنتج؟</p>
+          <div class="mrow"><input type="number" data-answer="1000" aria-label="الإجابة"><button class="btn mcheck" style="--c:var(--com)">تحقّقي</button><span class="mres"></span></div></section>
+      </div>
+      <button class="btn fill print-ws" style="--c:var(--ink);margin-top:16px">اطبعي الورقة</button>
+    </div>
+
+    <div class="ws" id="ws3">
+      <div class="ws-top"><div><h3>مهمة: اختاري فلزًا يحمي خزان ماء من الحديد</h3><p class="note">نوع التفاعل المستهدف: الإحلال البسيط وسلسلة النشاط</p></div>
+        <div class="ws-fields"><input type="text" placeholder="الاسم"><input type="text" placeholder="الفصل"></div></div>
+      <p>خزانات الماء الحديدية في المنازل تتآكل مع الوقت. يُثبَّت داخلها قضيب من فلز أنشط من الحديد يتآكل بدلًا منه، ويسمى «الفلز المضحّي». المتاح لديك: النحاس، الخارصين، المغنيسيوم، الفضة.</p>
+      <div class="stem">
+        <section class="S"><div class="letter"><span>S</span><b>العلوم</b></div><p>رتّبي الفلزات الأربعة مع الحديد حسب سلسلة النشاط. أيها يصلح فلزًا مضحّيًا؟ ولماذا لا يصلح النحاس؟</p><textarea></textarea></section>
+        <section class="T"><div class="letter"><span>T</span><b>التقنية</b></div><p>كيف يمكن تنبيه صاحب المنزل إلى أن القضيب تآكل ويجب تغييره؟ اقترحي حلًا تقنيًا بسيطًا.</p><textarea></textarea></section>
+        <section class="E"><div class="letter"><span>E</span><b>الهندسة</b></div><p>أين تضعين القضيب داخل الخزان؟ وما الشكل الأنسب له لتطول مدة عمله؟ برّري اختيارك.</p><textarea></textarea></section>
+        <section class="M"><div class="letter"><span>M</span><b>الرياضيات</b></div><p>قضيب من الخارصين كتلته ١٢٠ جرامًا، يفقد ١٥ جرامًا كل سنة. بعد كم سنة يجب استبداله؟</p>
+          <div class="mrow"><input type="number" data-answer="8" aria-label="الإجابة"><button class="btn mcheck" style="--c:var(--com)">تحقّقي</button><span class="mres"></span></div></section>
+      </div>
+      <button class="btn fill print-ws" style="--c:var(--ink);margin-top:16px">اطبعي الورقة</button>
+    </div>
+  </div>
+</section>
+
+<!-- 16 مسابقة الفرق -->
+<section class="slide" data-title="المسابقة الكبرى">
+  <div class="inner quiz" id="quiz"></div>
+</section>
+
+<!-- 17 الخلاصة وبطاقة الخروج -->
+<section class="slide" data-title="الخلاصة وبطاقة الخروج">
+  <div class="inner">
+    <div class="slide-head"><span class="swatch"></span><h2>الخلاصة</h2></div>
+    <table>
+      <thead><tr><th>النوع</th><th>الشكل العام</th><th>كيف أتعرّف عليه</th></tr></thead>
+      <tbody>
+        <tr class="t-syn"><td>التكوين</td><td><span class="eq">A + B → AB</span></td><td>ناتج واحد فقط</td></tr>
+        <tr class="t-com"><td>الاحتراق</td><td><span class="eq">X + O2 → أكاسيد</span></td><td>الأكسجين متفاعل وتنطلق طاقة</td></tr>
+        <tr class="t-dec"><td>التفكك</td><td><span class="eq">AB → A + B</span></td><td>متفاعل واحد فقط</td></tr>
+        <tr class="t-sin"><td>الإحلال البسيط</td><td><span class="eq">A + BC → AC + B</span></td><td>عنصر حر في كل طرف</td></tr>
+        <tr class="t-dbl"><td>الإحلال المزدوج</td><td><span class="eq">AB + CD → AD + CB</span></td><td>مركبان في كل طرف، وينتج راسب أو ماء أو غاز</td></tr>
+      </tbody>
+    </table>
+    <div class="panel" style="margin-top:22px">
+      <h3>بطاقة الخروج</h3>
+      <div id="exit"></div>
+      <button class="btn fill" id="exitCheck" style="--c:var(--ink);margin-top:12px">تحقّقي من إجاباتك</button>
+      <span class="mark" id="exitMark" style="margin-right:12px"></span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav class="menu" id="menu" aria-label="فهرس الشرائح"><ol id="menuList"></ol></nav>
+
+<div class="bar">
+  <button id="menuBtn" aria-label="فهرس الشرائح">☰ الفهرس</button>
+  <button id="prev">السابق</button>
+  <div class="progress"><span id="prog"></span></div>
+  <span class="count" id="count"></span>
+  <button class="primary" id="next">التالي</button>
+  <button id="fsBtn" aria-label="ملء الشاشة">⛶</button>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+/* ===== روابط الفيديو: ضعي معرّف الفيديو من يوتيوب في id ليظهر تلقائيًا ===== */
+const VIDEOS = [
+  { t:'ما التفاعل الكيميائي؟ وأدلة حدوثه', d:'مقدمة قصيرة قبل التصنيف', q:'أدلة حدوث التفاعل الكيميائي كيمياء 1 أول ثانوي', id:'' },
+  { t:'التكوين والاحتراق والتفكك', d:'الأنواع الثلاثة الأولى بأمثلة', q:'تفاعلات التكوين والاحتراق والتفكك كيمياء 1', id:'' },
+  { t:'الإحلال البسيط وسلسلة النشاط', d:'متى يحل عنصر محل آخر؟', q:'الإحلال البسيط سلسلة النشاط كيمياء 1', id:'' },
+  { t:'الإحلال المزدوج وتكوّن الراسب', d:'تجارب الترسيب في المختبر', q:'تفاعلات الإحلال المزدوج تكون راسب كيمياء 1', id:'' }
+];
+
+/* ===== أدوات عامة ===== */
+const chem = s => s.replace(/([A-Za-z\)])(\d+)/g,'$1<sub>$2</sub>');
+const fmt = s => /^[0-9A-Za-z()+→↓↑\s]+$/.test(s)
+  ? `<span class="eq">${chem(s)}</span>`
+  : s.replace(/[0-9A-Z(][0-9A-Za-z()+→↓↑ ]*[0-9A-Za-z()]|[A-Z]/g, m => `<span class="f">${chem(m)}</span>`);
+document.querySelectorAll('.eq').forEach(e=>{ if(!e.querySelector('sub')) e.innerHTML = chem(e.innerHTML); });
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+
+/* ===== التنقل ===== */
+const slides=[...document.querySelectorAll('.slide')];
+let cur=0;
+function go(i){
+  cur=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===cur));
+  document.getElementById('prog').style.width=((cur+1)/slides.length*100)+'%';
+  document.getElementById('count').textContent=`${cur+1} / ${slides.length}`;
+  document.getElementById('prev').disabled=cur===0;
+  document.getElementById('next').disabled=cur===slides.length-1;
+  slides[cur].scrollTop=0;
+}
+document.getElementById('next').onclick=()=>go(cur+1);
+document.getElementById('prev').onclick=()=>go(cur-1);
+document.addEventListener('keydown',e=>{
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if(e.key==='ArrowLeft'||e.key==='PageDown') go(cur+1);
+  if(e.key==='ArrowRight'||e.key==='PageUp') go(cur-1);
+  if(e.key==='Escape') menu.classList.remove('open');
+});
+const menu=document.getElementById('menu');
+document.getElementById('menuList').innerHTML=slides.map((s,i)=>`<li><button data-i="${i}">${s.dataset.title}</button></li>`).join('');
+menu.addEventListener('click',e=>{const b=e.target.closest('button');if(b){go(+b.dataset.i);menu.classList.remove('open');}});
+document.getElementById('menuBtn').onclick=()=>menu.classList.toggle('open');
+document.getElementById('fsBtn').onclick=()=>{ document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen?.(); };
+['syn','com','dec','sin','pred','dbl'].forEach(id=>{
+  const head=document.querySelector('#'+id+' .slide-head');
+  head.insertAdjacentHTML('beforeend','<button class="back-types" data-goto="types">العودة إلى الأنواع ↩</button>');
+});
+document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>go(slides.indexOf(document.getElementById(b.dataset.goto))));
+document.querySelectorAll('.reveal').forEach(b=>b.onclick=()=>{const a=b.nextElementSibling;a.hidden=!a.hidden;b.textContent=a.hidden?'أظهري الإجابة':'أخفي الإجابة';});
+
+/* ===== سلسلة النشاط والمحاكي ===== */
+const ACT=['Li','K','Ca','Na','Mg','Al','Zn','Fe','Ni','Sn','Pb','H','Cu','Ag','Au'];
+const HAL=['F','Cl','Br','I'];
+document.getElementById('seriesBar').innerHTML=ACT.map(x=>`<span class="${x==='H'?'h':''}">${x}</span>`).join('');
+const ELS=[['Mg','مغنيسيوم'],['Al','ألومنيوم'],['Zn','خارصين'],['Fe','حديد'],['Cu','نحاس'],['Ag','فضة'],['Cl2','كلور'],['Br2','بروم'],['I2','يود']];
+const CMPS=[['CuSO4','كبريتات النحاس','Cu',null],['AgNO3','نترات الفضة','Ag',null],['ZnSO4','كبريتات الخارصين','Zn',null],['MgSO4','كبريتات المغنيسيوم','Mg',null],
+  ['HCl','حمض الهيدروكلوريك','H','Cl'],['NaCl','كلوريد الصوديوم','Na','Cl'],['NaBr','بروميد الصوديوم','Na','Br'],['KI','يوديد البوتاسيوم','K','I']];
+const RX={
+ 'Mg|CuSO4':'Mg + CuSO4 → MgSO4 + Cu','Mg|AgNO3':'Mg + 2AgNO3 → Mg(NO3)2 + 2Ag','Mg|ZnSO4':'Mg + ZnSO4 → MgSO4 + Zn','Mg|HCl':'Mg + 2HCl → MgCl2 + H2',
+ 'Al|CuSO4':'2Al + 3CuSO4 → Al2(SO4)3 + 3Cu','Al|AgNO3':'Al + 3AgNO3 → Al(NO3)3 + 3Ag','Al|ZnSO4':'2Al + 3ZnSO4 → Al2(SO4)3 + 3Zn','Al|HCl':'2Al + 6HCl → 2AlCl3 + 3H2',
+ 'Zn|CuSO4':'Zn + CuSO4 → ZnSO4 + Cu','Zn|AgNO3':'Zn + 2AgNO3 → Zn(NO3)2 + 2Ag','Zn|HCl':'Zn + 2HCl → ZnCl2 + H2',
+ 'Fe|CuSO4':'Fe + CuSO4 → FeSO4 + Cu','Fe|AgNO3':'Fe + 2AgNO3 → Fe(NO3)2 + 2Ag','Fe|HCl':'Fe + 2HCl → FeCl2 + H2',
+ 'Cu|AgNO3':'Cu + 2AgNO3 → Cu(NO3)2 + 2Ag',
+ 'Cl2|NaBr':'Cl2 + 2NaBr → 2NaCl + Br2','Cl2|KI':'Cl2 + 2KI → 2KCl + I2','Br2|KI':'Br2 + 2KI → 2KBr + I2'
+};
+const NAME={Mg:'المغنيسيوم',Al:'الألومنيوم',Zn:'الخارصين',Fe:'الحديد',Cu:'النحاس',Ag:'الفضة',Na:'الصوديوم',K:'البوتاسيوم',H:'الهيدروجين',Cl:'الكلور',Br:'البروم',I:'اليود'};
+const pEl=document.getElementById('pEl'),pCmp=document.getElementById('pCmp'),pRes=document.getElementById('pRes');
+pEl.innerHTML=ELS.map(([f,n])=>`<option value="${f}">${n} (${f})</option>`).join('');
+pCmp.innerHTML=CMPS.map(([f,n])=>`<option value="${f}">${n} (${f})</option>`).join('');
+function predict(){
+  const el=pEl.value, c=CMPS.find(x=>x[0]===pCmp.value), sym=el.replace('2','');
+  const isHal=HAL.includes(sym); let ok=false, why='';
+  if(isHal){
+    if(!c[3]) why=`لا يوجد هالوجين في ${c[1]} ليحل ${NAME[sym]} محله.`;
+    else if(c[3]===sym) why=`${NAME[sym]} موجود أصلًا في المركب.`;
+    else if(HAL.indexOf(sym)<HAL.indexOf(c[3])){ok=true;why=`${NAME[sym]} أنشط من ${NAME[c[3]]} فيحل محله.`;}
+    else why=`${NAME[sym]} أقل نشاطًا من ${NAME[c[3]]}، فلا يستطيع أن يحل محله.`;
+  } else {
+    if(c[2]===sym) why=`${NAME[sym]} موجود أصلًا في المركب.`;
+    else if(ACT.indexOf(sym)<ACT.indexOf(c[2])){ok=true;why=`${NAME[sym]} يسبق ${NAME[c[2]]} في سلسلة النشاط فيحل محله.`;}
+    else why=`${NAME[sym]} يأتي بعد ${NAME[c[2]]} في سلسلة النشاط، أي أنه أقل نشاطًا.`;
+  }
+  pRes.className='result '+(ok?'yes':'no');
+  pRes.innerHTML=ok?`<div class="big" style="color:var(--ok)">يحدث تفاعل</div><span class="eq">${chem(RX[el+'|'+c[0]])}</span><p>${why}</p>`
+                    :`<div class="big" style="color:var(--bad)">لا يحدث تفاعل</div><p>${why}</p>`;
+}
+pEl.onchange=pCmp.onchange=predict; predict();
+
+/* ===== الفيديوهات ===== */
+const vidIdFrom = u => (u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/)||[])[1] || (/^[\w-]{11}$/.test(u.trim())?u.trim():null);
+function renderVideos(){
+  document.getElementById('videos').innerHTML=VIDEOS.map((v,i)=>`
+    <div class="vid">
+      <div class="frame">${v.id?`<iframe src="https://www.youtube-nocookie.com/embed/${v.id}" title="${v.t}" allowfullscreen loading="lazy"></iframe>`
+        :`<div><p class="note">لم يُضف مقطع بعد</p><a class="btn" style="--c:var(--com)" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${encodeURIComponent(v.q)}">ابحثي في يوتيوب</a></div>`}</div>
+      <div class="body"><h3>${v.t}</h3><p class="note">${v.d}</p>
+        <div class="row"><input type="text" placeholder="الصقي رابط الفيديو هنا" data-v="${i}" aria-label="رابط الفيديو"><button class="btn" data-vb="${i}">اعرضي</button></div>
+      </div>
+    </div>`).join('');
+}
+document.getElementById('videos').addEventListener('click',e=>{
+  const b=e.target.closest('[data-vb]'); if(!b) return;
+  const inp=document.querySelector(`[data-v="${b.dataset.vb}"]`); const id=vidIdFrom(inp.value);
+  if(id){VIDEOS[b.dataset.vb].id=id;renderVideos();} else {inp.value='';inp.placeholder='الرابط غير صحيح، انسخيه من يوتيوب مباشرة';}
+});
+renderVideos();
+
+/* ===== لعبة صنّفي بسرعة ===== */
+const POOL=[['2Na + Cl2 → 2NaCl','syn'],['CaO + H2O → Ca(OH)2','syn'],['N2 + 3H2 → 2NH3','syn'],['2SO2 + O2 → 2SO3','syn'],
+ ['CH4 + 2O2 → CO2 + 2H2O','com'],['C3H8 + 5O2 → 3CO2 + 4H2O','com'],['C2H5OH + 3O2 → 2CO2 + 3H2O','com'],['2C4H10 + 13O2 → 8CO2 + 10H2O','com'],
+ ['2H2O → 2H2 + O2','dec'],['CaCO3 → CaO + CO2','dec'],['2NaN3 → 2Na + 3N2','dec'],['2KClO3 → 2KCl + 3O2','dec'],
+ ['Zn + CuSO4 → ZnSO4 + Cu','sin'],['Cl2 + 2KBr → 2KCl + Br2','sin'],['Mg + 2HCl → MgCl2 + H2','sin'],['Fe2O3 + 2Al → Al2O3 + 2Fe','sin'],
+ ['AgNO3 + NaCl → AgCl + NaNO3','dbl'],['HCl + NaOH → NaCl + H2O','dbl'],['BaCl2 + Na2SO4 → BaSO4 + 2NaCl','dbl'],['Pb(NO3)2 + 2KI → PbI2 + 2KNO3','dbl']];
+const TNAME={syn:'تكوين',com:'احتراق',dec:'تفكك',sin:'إحلال بسيط',dbl:'إحلال مزدوج'};
+let g={on:false};
+const gEq=document.getElementById('gEq'),gFb=document.getElementById('gFb'),gBtns=[...document.querySelectorAll('#gChoices button')];
+function gNext(){ if(!g.deck.length) g.deck=shuffle(POOL); g.q=g.deck.pop(); gEq.className='game-eq'; gEq.innerHTML=`<span class="eq">${chem(g.q[0])}</span>`; }
+function gEnd(){
+  clearInterval(g.timer); g.on=false; gBtns.forEach(b=>b.disabled=true);
+  g.best=Math.max(g.best||0,g.score);
+  gEq.className='game-eq'; gEq.innerHTML=`<h3>انتهى الوقت</h3><p class="lead" style="margin:0 auto">نقاطك ${g.score} من ${g.answered} محاولة. أفضل نتيجة في هذه الجلسة: ${g.best}</p>`;
+  gFb.textContent=''; document.getElementById('gStart').hidden=false; document.getElementById('gStart').textContent='العبي مرة أخرى';
+}
+document.getElementById('gStart').onclick=function(){
+  Object.assign(g,{on:true,score:0,streak:0,answered:0,t:60,deck:shuffle(POOL)});
+  this.hidden=true; gBtns.forEach(b=>b.disabled=false); gFb.textContent='';
+  ['gScore','gStreak'].forEach(id=>document.getElementById(id).textContent=0); document.getElementById('gTime').textContent=60;
+  gNext(); clearInterval(g.timer);
+  g.timer=setInterval(()=>{ g.t--; document.getElementById('gTime').textContent=g.t; if(g.t<=0) gEnd(); },1000);
+};
+gBtns.forEach(b=>b.onclick=()=>{
+  if(!g.on) return; g.answered++;
+  if(b.dataset.t===g.q[1]){ g.streak++; g.score+=10+(g.streak%3===0?5:0); gEq.classList.add('right'); gFb.textContent=g.streak%3===0?'ممتاز! ثلاث متتالية +٥':'صحيح'; gFb.style.color='var(--ok)'; }
+  else { g.streak=0; gEq.classList.add('wrong'); gFb.textContent=`الإجابة: ${TNAME[g.q[1]]}`; gFb.style.color='var(--bad)'; }
+  document.getElementById('gScore').textContent=g.score; document.getElementById('gStreak').textContent=g.streak;
+  gBtns.forEach(x=>x.disabled=true);
+  setTimeout(()=>{ if(g.on){ gBtns.forEach(x=>x.disabled=false); gNext(); } },650);
+});
+
+/* ===== المسابقة الكبرى للفرق ===== */
+const QS=[
+ ['النوع الذي تتحد فيه مادتان أو أكثر لتكوين مادة واحدة',['تكوين','تفكك','احتراق','إحلال مزدوج'],0],
+ ['تفاعل يكون الأكسجين فيه متفاعلًا دائمًا وتنطلق منه طاقة',['إحلال بسيط','احتراق','تفكك','إحلال مزدوج'],1],
+ ['نواتج تفكك CaCO3 بالحرارة',['CaO + CO2','Ca + CO3','CaO + O2','Ca(OH)2'],0],
+ ['أي فلز يحل محل النحاس في محلول CuSO4؟',['Ag','Au','Zn','Pt'],2],
+ ['ما ناتج تفاعل Cl2 مع محلول NaBr؟',['2NaCl + Br2','لا يحدث تفاعل','NaClBr','2Na + 2BrCl'],0],
+ ['الإحلال المزدوج يحدث عندما يتكوّن',['راسب أو ماء أو غاز','عنصر حر فقط','أكسجين دائمًا','مركب واحد فقط'],0],
+ ['تفاعل الوسادة الهوائية 2NaN3 → 2Na + 3N2 من نوع',['تكوين','تفكك','إحلال بسيط','احتراق'],1],
+ ['مشروع الهيدروجين الأخضر في نيوم يعتمد على تحليل الماء كهربائيًا، وهو تفاعل',['تفكك','تكوين','إحلال مزدوج','إحلال بسيط'],0],
+ ['إنتاج الأمونيا في الجبيل N2 + 3H2 → 2NH3 تفاعل',['احتراق','تكوين','تفكك','إحلال بسيط'],1],
+ ['ماذا يحدث عند وضع Cu في محلول ZnSO4؟',['لا يحدث تفاعل','CuSO4 + Zn','CuZn + SO4','Cu2SO4 + Zn'],0],
+ ['في AgNO3 + NaCl → AgCl + NaNO3 الراسب هو',['AgCl','NaNO3','NaCl','AgNO3'],0],
+ ['الشكل العام A + BC → AC + B يمثل',['الإحلال المزدوج','التفكك','الإحلال البسيط','التكوين'],2],
+ ['احتراق الميثان CH4 احتراقًا تامًا ينتج',['CO2 و H2O','C و H2','CO2 فقط','CH2 و O2'],0]
+];
+const quiz=document.getElementById('quiz'); const QT=20;
+let Q={teams:[],i:0,turn:0,order:[]};
+function quizSetup(){
+  quiz.innerHTML=`<div class="slide-head"><span class="swatch"></span><div><h2>المسابقة الكبرى</h2><p class="sub">${QS.length} سؤالًا. يتناوب الفريقان، ولكل سؤال ${QT} ثانية. الإجابة الصحيحة بعشر نقاط</p></div></div>
+  <div class="panel"><h3>أسماء الفرق</h3>
+   <div class="teams-setup" id="tNames">${['فريق الذرات','فريق الجزيئات','فريق الأيونات','فريق النظائر'].map((n,i)=>`<input type="text" value="${n}" aria-label="اسم الفريق ${i+1}" ${i>1?'data-opt':''}>`).join('')}</div>
+   <label><select id="tCount" style="width:auto"><option value="2">فريقان</option><option value="3">ثلاثة فرق</option><option value="4">أربعة فرق</option></select></label>
+   <button class="btn fill" id="qStart" style="--c:var(--ink);margin-right:10px">ابدئي المسابقة</button></div>`;
+  const ins=[...quiz.querySelectorAll('#tNames input')];
+  const sync=()=>ins.forEach((x,i)=>x.hidden=i>=+tCount.value); const tCount=quiz.querySelector('#tCount'); tCount.onchange=sync; sync();
+  quiz.querySelector('#qStart').onclick=()=>{ Q={teams:ins.slice(0,+tCount.value).map(x=>({n:x.value.trim()||'فريق',s:0})),i:0,turn:0,order:shuffle(QS)}; quizQ(); };
+}
+function board(){ return `<div class="board">${Q.teams.map((t,k)=>`<div class="team ${k===Q.turn?'turn':''}">${t.n}<b>${t.s}</b></div>`).join('')}</div>`; }
+function quizQ(){
+  const q=Q.order[Q.i]; const opts=shuffle(q[1].map((o,k)=>[o,k===q[2]]));
+  quiz.innerHTML=`${board()}<div class="qcard"><div class="qtop"><span>السؤال ${Q.i+1} من ${Q.order.length}</span><span>الدور: ${Q.teams[Q.turn].n}</span><span id="qSec">${QT}</span></div>
+   <div class="timer"><span id="qBar" style="width:100%"></span></div>
+   <div class="qtext">${fmt(q[0])}</div>
+   <div class="opts">${opts.map(([o,r])=>`<button data-r="${r}">${fmt(o)}</button>`).join('')}</div>
+   <div class="feedback" id="qFb"></div><div id="qNav"></div></div>`;
+  let t=QT; clearInterval(Q.timer);
+  Q.timer=setInterval(()=>{ t--; quiz.querySelector('#qSec').textContent=t; quiz.querySelector('#qBar').style.width=(t/QT*100)+'%'; if(t<=0) quizAnswer(null); },1000);
+  quiz.querySelectorAll('.opts button').forEach(b=>b.onclick=()=>quizAnswer(b));
+}
+function quizAnswer(b){
+  clearInterval(Q.timer);
+  const all=[...quiz.querySelectorAll('.opts button')]; all.forEach(x=>{x.disabled=true; if(x.dataset.r==='true') x.classList.add('right');});
+  const fb=quiz.querySelector('#qFb');
+  if(b&&b.dataset.r==='true'){ Q.teams[Q.turn].s+=10; fb.textContent=`أحسنتِ! +١٠ لـ ${Q.teams[Q.turn].n}`; fb.style.color='var(--ok)'; }
+  else { if(b) b.classList.add('wrong'); fb.textContent=b?'إجابة غير صحيحة':'انتهى الوقت'; fb.style.color='var(--bad)'; }
+  quiz.querySelectorAll('.team b')[Q.turn].textContent=Q.teams[Q.turn].s;
+  const last=Q.i===Q.order.length-1;
+  quiz.querySelector('#qNav').innerHTML=`<button class="btn fill" style="--c:var(--ink);margin-top:10px">${last?'اعرضي النتيجة':'السؤال التالي'}</button>`;
+  quiz.querySelector('#qNav button').onclick=()=>{ if(last) quizEnd(); else { Q.i++; Q.turn=(Q.turn+1)%Q.teams.length; quizQ(); } };
+}
+function quizEnd(){
+  const max=Math.max(...Q.teams.map(t=>t.s)); const w=Q.teams.filter(t=>t.s===max);
+  Q.turn=-1;
+  quiz.innerHTML=`${board()}<div class="qcard winner"><div style="font-size:56px">🏆</div><h3>${w.length>1?'تعادل بين '+w.map(t=>t.n).join(' و '):'الفائز: '+w[0].n}</h3><p class="lead" style="margin:10px auto">${max} نقطة</p>
+   <button class="btn fill" style="--c:var(--ink)" id="qAgain">مسابقة جديدة</button></div>`;
+  quiz.querySelector('#qAgain').onclick=quizSetup;
+}
+quizSetup();
+
+/* ===== أوراق العمل ===== */
+document.querySelectorAll('.tabs button').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===t));
+  document.querySelectorAll('.ws').forEach(w=>w.classList.toggle('show',w.id===t.dataset.ws));
+});
+document.querySelectorAll('.mcheck').forEach(b=>b.onclick=()=>{
+  const inp=b.previousElementSibling, r=b.nextElementSibling;
+  const ok=+inp.value===+inp.dataset.answer;
+  r.textContent=inp.value===''?'اكتبي إجابتك أولًا':ok?'صحيح ✓':'راجعي النسبة وحاولي مرة أخرى';
+  r.style.color=ok?'var(--ok)':'var(--bad)';
+});
+document.querySelectorAll('.print-ws').forEach(b=>b.onclick=()=>{
+  const ws=b.closest('.ws'), clone=ws.cloneNode(true);
+  const src=ws.querySelectorAll('input,textarea'), dst=clone.querySelectorAll('input,textarea');
+  src.forEach((s,i)=>{ if(s.tagName==='TEXTAREA') dst[i].textContent=s.value; else dst[i].setAttribute('value',s.value); });
+  const pa=document.getElementById('printArea'); pa.innerHTML=''; pa.appendChild(clone); window.print();
+});
+
+/* ===== بطاقة الخروج ===== */
+const EXIT=[['2KClO3 → 2KCl + 3O2','dec'],['Mg + 2HCl → MgCl2 + H2','sin'],['C3H8 + 5O2 → 3CO2 + 4H2O','com'],['HCl + NaOH → NaCl + H2O','dbl'],['N2 + 3H2 → 2NH3','syn']];
+document.getElementById('exit').innerHTML=EXIT.map((e,i)=>`<div class="exit-item"><span class="eq">${chem(e[0])}</span>
+  <select data-a="${e[1]}" aria-label="نوع التفاعل ${i+1}"><option value="">اختاري النوع</option>${Object.entries(TNAME).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select><span class="mark"></span></div>`).join('');
+document.getElementById('exitCheck').onclick=()=>{
+  let n=0; document.querySelectorAll('#exit select').forEach(s=>{ const ok=s.value===s.dataset.a; if(ok) n++;
+    const m=s.nextElementSibling; m.textContent=ok?'✓':'✗ '+TNAME[s.dataset.a]; m.style.color=ok?'var(--ok)':'var(--bad)'; });
+  document.getElementById('exitMark').textContent=`${n} من ${EXIT.length}`;
+};
+
+go(0);
+</script>
+</body>
+</html>
